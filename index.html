@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOVIE ZONE - iOS Water UI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Compact iOS Sidebar -->
+        <nav class="sidebar">
+            <button class="nav-btn active" onclick="switchTab('home')" title="Home">🏠</button>
+            <button class="nav-btn" onclick="switchTab('search')" title="Search">🔍</button>
+            <button class="nav-btn" onclick="switchTab('history')" title="History">🕒</button>
+            <button class="nav-btn" onclick="switchTab('request')" title="Request">💡</button>
+            <button class="nav-btn" onclick="switchTab('discussion')" title="Discussion">💬</button>
+            <button class="nav-btn" onclick="switchTab('login')" title="Admin Login">👤</button>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- HOME VIEW -->
+            <section id="home-view" class="view active">
+                <div class="hero-banner" id="heroBanner">
+                    <div class="hero-overlay"></div>
+                    <div class="hero-info">
+                        <span class="badge-featured" id="heroBadge">FEATURED SERIES</span>
+                        <h1 id="heroTitle">HOME</h1>
+                        <div class="hero-meta">
+                            <span class="rating-box">HD</span>
+                            <span id="heroTypeLabel">Series • 8.4/10</span>
+                        </div>
+                        <div class="hero-buttons">
+                            <button class="btn-primary" onclick="playHeroMovie()">▶ Watch</button>
+                            <button class="btn-secondary" onclick="playHeroMovie()">ℹ Info</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-header">
+                    <h2>Trending Now</h2>
+                </div>
+                <div class="movie-grid" id="movieGrid"></div>
+            </section>
+
+            <!-- SEARCH VIEW -->
+            <section id="search-view" class="view" style="display: none;">
+                <div class="search-box-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="Search movies or series..." oninput="handleSearch()">
+                </div>
+                <div class="movie-grid" id="searchResultGrid"></div>
+            </section>
+
+            <!-- HISTORY VIEW -->
+            <section id="history-view" class="view" style="display: none;">
+                <h2 style="margin-bottom: 20px;">Watch History</h2>
+                <div class="movie-grid" id="historyGrid"></div>
+            </section>
+
+            <!-- REQUEST VIEW -->
+            <section id="request-view" class="view" style="display: none;">
+                <div class="glass-card">
+                    <h2>Request a Movie</h2>
+                    <input type="text" id="reqTitle" placeholder="Enter movie or series name..." class="glass-input">
+                    <button class="btn-primary" onclick="submitRequest()" style="width:100%;">Submit Request</button>
+                    <div id="requestList" style="margin-top: 20px;"></div>
+                </div>
+            </section>
+
+            <!-- DISCUSSION VIEW -->
+            <section id="discussion-view" class="view" style="display: none;">
+                <div class="glass-card" style="max-width: 800px;">
+                    <h2>💬 Community Discussion</h2>
+                    <div class="comment-input-box" style="margin-top: 15px;">
+                        <input type="text" id="globalCommentInput" placeholder="Write your thoughts..." class="glass-input" style="margin:0;">
+                        <button class="btn-primary" onclick="addGlobalComment()">Post</button>
+                    </div>
+                    <div id="globalCommentList" style="margin-top: 20px;"></div>
+                </div>
+            </section>
+
+            <!-- LOGIN / ADMIN VIEW -->
+            <section id="login-view" class="view" style="display: none;">
+                <div id="authContainer" class="glass-card auth-box">
+                    <h2>Login</h2>
+                    <input type="email" id="loginEmail" placeholder="Login email" class="glass-input">
+                    <button class="btn-primary" onclick="handleLogin()" style="width:100%;">Login</button>
+                </div>
+
+                <div id="adminDashboard" style="display: none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h2>👑 Admin Panel</h2>
+                        <button class="btn-secondary" onclick="handleLogout()" style="background:rgba(229,9,20,0.3);">Logout</button>
+                    </div>
+                    <div class="glass-card" style="max-width:100%;">
+                        <h3 id="formTitle">Upload Movie / Series</h3>
+                        <input type="hidden" id="editIndex" value="-1">
+                        <input type="text" id="upTitle" placeholder="Movie Title" class="glass-input">
+                        <select id="upType" class="glass-input">
+                            <option value="non-part">Non-Part (Standalone)</option>
+                            <option value="series">Series (Seasons & Episodes)</option>
+                        </select>
+                        <input type="text" id="upBanner" placeholder="Banner Image URL" class="glass-input">
+                        <input type="text" id="upVideoUrl" placeholder="Direct Video URL (.mp4)" class="glass-input">
+                        <input type="text" id="upEpisodes" placeholder="Episodes (comma separated: Ep 1, Ep 2)" class="glass-input">
+                        <button class="btn-primary" onclick="saveAdminMovie()">Save Entry</button>
+                        <button class="btn-secondary" onclick="resetAdminForm()" style="margin-left:10px;">Cancel</button>
+                    </div>
+                    <h3 style="margin-top:25px; margin-bottom:15px;">Manage Database</h3>
+                    <div id="adminMovieList" style="display:flex; flex-direction:column; gap:10px;"></div>
+                </div>
+            </section>
+
+            <!-- MOVIE DETAIL & MEDIA PLAYER VIEW (iOS style like images) -->
+            <section id="detail-view" class="view" style="display: none;">
+                <div class="player-wrapper" id="playerWrapper">
+                    <video id="videoPlayer" src="" playsinline></video>
+                    
+                    <div class="video-controls" id="videoControls">
+                        <div class="top-bar">
+                            <button onclick="closePlayer()">✕</button>
+                            <span id="nowPlayingTitle" style="color:#fff; font-size:14px; font-weight:500;">Streaming Media</span>
+                            <div class="fullscreen-btns">
+                                <button onclick="toggleFullscreen(true)">⛶</button>
+                                <button onclick="toggleFullscreen(false)" id="exitFullBtn" style="display:none;">🗗</button>
+                            </div>
+                        </div>
+                        
+                        <div class="center-controls">
+                            <button onclick="skipTime(-10)">⏪</button>
+                            <button id="playPauseBtn" onclick="togglePlayPause()">⏸</button>
+                            <button onclick="skipTime(10)">⏩</button>
+                        </div>
+
+                        <div class="bottom-player-controls">
+                            <div class="seek-bar-container">
+                                <span id="currentTime">00:00</span>
+                                <input type="range" id="seekBar" value="0" min="0" max="100" step="0.1" oninput="seekVideo(this.value)">
+                                <span id="durationTime">00:00</span>
+                            </div>
+                            <div class="extra-player-options">
+                                <button onclick="alert('Audio / Subtitles Options (Enabled)')">🔊 Audio/Sub</button>
+                                <button onclick="alert('Video Filters & Speed Options')">⚙ Options</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="drawer" id="episodeDrawer">
+                    <div class="drawer-handle" onclick="toggleDrawer()"></div>
+                    <div id="drawerContent"></div>
+                    
+                    <div class="comment-section">
+                        <h3>💬 Movie Comments</h3>
+                        <div class="comment-input-box">
+                            <input type="text" id="commentInput" placeholder="Add a comment..." class="glass-input" style="margin:0;">
+                            <button class="btn-primary" onclick="addComment()">Post</button>
+                        </div>
+                        <div id="commentList" style="margin-top:15px;"></div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
